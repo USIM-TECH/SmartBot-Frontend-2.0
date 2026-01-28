@@ -1,0 +1,7 @@
+{
+  "name": "SmartBot - AI Personal Shopping Assistant",
+  "description": "A smart shopping companion that helps you compare prices across nearby stores using AI-powered insights and real-time location grounding.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
