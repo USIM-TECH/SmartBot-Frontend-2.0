@@ -1,57 +1,30 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
+/**
+ * Mocking the Gemini service to return static data for now.
+ * This allows the app to run without any API keys or network requests.
+ */
 export const generateComparison = async (prompt, selectedStores) => {
-  const model = 'gemini-3-flash-preview';
+  // Simulate a short delay to feel like an AI response
+  await new Promise(resolve => setTimeout(resolve, 800));
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: `The user wants to compare prices for: "${prompt}". 
-    The available stores are: ${selectedStores.join(', ')}.
-    Return a detailed price comparison in JSON format.`,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          text: { type: Type.STRING, description: "A friendly intro message." },
-          comparisonData: {
-            type: Type.OBJECT,
-            properties: {
-              productName: { type: Type.STRING },
-              productImage: { type: Type.STRING, description: "Use a placeholder URL from picsum or similar for the product." },
-              stores: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    storeName: { type: Type.STRING },
-                    storeIcon: { type: Type.STRING, description: "A Material Symbol name like storefront or local_grocery_store" },
-                    price: { type: Type.NUMBER },
-                    currency: { type: Type.STRING }
-                  },
-                  required: ["storeName", "price"]
-                }
-              },
-              recommendations: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
-              }
-            },
-            required: ["productName", "stores", "recommendations"]
-          }
-        },
-        required: ["text"]
-      }
+  console.log(`[MOCK] Processing request for: "${prompt}"`);
+
+  return {
+    text: `Here is a price comparison for "${prompt}" from your selected stores.`,
+    comparisonData: {
+      productName: prompt.charAt(0).toUpperCase() + prompt.slice(1),
+      productImage: `https://picsum.photos/seed/${encodeURIComponent(prompt)}/300/300`,
+      stores: selectedStores.map((store, index) => ({
+        storeName: store,
+        storeIcon: "storefront",
+        price: 25.50 + index, 
+        currency: "RM"
+      })),
+      recommendations: [
+        `Prices for "${prompt}" are currently stable.`,
+        "Consider checking for bulk discounts.",
+        "Prices may vary depending on store location."
+      ]
     }
-  });
-
-  try {
-    return JSON.parse(response.text);
-  } catch (e) {
-    console.error("Failed to parse AI response:", e);
-    return { text: "I'm sorry, I couldn't generate a comparison right now." };
-  }
+  };
 };

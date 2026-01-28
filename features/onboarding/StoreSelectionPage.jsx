@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { INITIAL_STORES } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
@@ -12,6 +13,7 @@ const StoreSelectionPage = ({
   onLogout
 }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isLocationAllowed, setIsLocationAllowed] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -54,13 +56,25 @@ const StoreSelectionPage = ({
             </div>
             <h1 className="text-base font-bold tracking-tight text-smart-dark dark:text-white">SmartBot</h1>
           </div>
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-xs font-bold text-slate-gray/60 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-          >
-            <span className="material-symbols-outlined text-base">logout</span>
-            <span>Log Out</span>
-          </button>
+          <div className="flex items-center gap-4">
+            {user && (
+              <div className="flex items-center gap-2 pr-4 border-r border-gray-100 dark:border-white/5 h-6">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-bold border border-primary/20">
+                  {user.displayName ? user.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
+                </div>
+                <span className="text-[10px] font-bold text-slate-gray/60 dark:text-gray-400 truncate max-w-[120px]">
+                  {user.displayName || user.email}
+                </span>
+              </div>
+            )}
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-xs font-bold text-slate-gray/60 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+            >
+              <span className="material-symbols-outlined text-base">logout</span>
+              <span>Log Out</span>
+            </button>
+          </div>
         </div>
       </header>
 

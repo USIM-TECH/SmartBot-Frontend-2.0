@@ -4,6 +4,7 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthInput from '../../components/ui/AuthInput';
+import authService from '../../services/authService';
 import { APP_NAME } from '../../constants';
 
 const ForgotPasswordSchema = Yup.object().shape({
@@ -12,9 +13,43 @@ const ForgotPasswordSchema = Yup.object().shape({
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
+  const [isSuccess, setIsSuccess] = React.useState(false);
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background-light dark:bg-[#131f1a]">
+        <header className="flex items-center justify-between px-6 py-3 md:px-12 bg-white/80 dark:bg-zinc-900/50 backdrop-blur-sm border-b border-gray-100 dark:border-white/5">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center text-white">
+              <span className="material-symbols-outlined text-base">shopping_bag</span>
+            </div>
+            <h2 className="text-base font-bold tracking-tight text-slate-gray dark:text-white">{APP_NAME}</h2>
+          </div>
+        </header>
+
+        <main className="flex-1 flex items-center justify-center p-6 relative">
+          <div className="w-full max-w-[400px] z-10">
+            <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/5 rounded-2xl p-8 shadow-2xl shadow-black/[0.03] text-center">
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400 mx-auto mb-6">
+                <span className="material-symbols-outlined text-3xl">mark_email_read</span>
+              </div>
+              <h1 className="text-smart-dark dark:text-white text-xl font-bold mb-3">Check your email</h1>
+              <p className="text-slate-gray/60 dark:text-gray-400 text-sm mb-8 leading-relaxed">
+                We've sent password reset instructions to your email address. Please follow the link in the email to reset your password.
+              </p>
+              <Link to="/login" className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:brightness-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm">
+                Return to Login
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background-light dark:bg-[#131f1a]">
+      {/* ... header and background remains same ... */}
       <header className="flex items-center justify-between px-6 py-3 md:px-12 bg-white/80 dark:bg-zinc-900/50 backdrop-blur-sm border-b border-gray-100 dark:border-white/5">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center text-white">
@@ -43,7 +78,7 @@ const ForgotPasswordPage = () => {
               <div className="text-center">
                 <h1 className="text-smart-dark dark:text-white text-xl font-bold tracking-tight mb-2">Forgot Password</h1>
                 <p className="text-slate-gray/60 dark:text-gray-400 text-[12px] leading-relaxed max-w-[280px] mx-auto">
-                  Enter your email address and we'll send you a 6-digit code to reset your password.
+                  Enter your email address and we'll send you instructions to reset your password.
                 </p>
               </div>
             </div>
@@ -51,12 +86,26 @@ const ForgotPasswordPage = () => {
             <Formik
               initialValues={{ email: '' }}
               validationSchema={ForgotPasswordSchema}
-              onSubmit={(values) => {
-                console.log(values);
-                navigate('/verify-code');
+              onSubmit={async (values, { setSubmitting, setStatus }) => {
+                try {
+                  await authService.sendPasswordReset(values.email);
+                  setIsSuccess(true);
+                } catch (error) {
+                  console.error('Reset password error:', error);
+                  setStatus({ error: error.message });
+                } finally {
+                  setSubmitting(false);
+                }
               }}
             >
+              {({ isSubmitting, status }) => (
               <Form className="space-y-6">
+                {status && status.error && (
+                  <div className="p-3 text-xs text-red-500 bg-red-50 rounded-lg border border-red-100 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">error</span>
+                    {status.error}
+                  </div>
+                )}
                 <AuthInput
                   label="Email Address"
                   name="email"
@@ -68,13 +117,15 @@ const ForgotPasswordPage = () => {
                 <div>
                   <button
                     type="submit"
-                    className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:brightness-95 active:scale-[0.98] transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 text-sm"
+                    disabled={isSubmitting}
+                    className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:brightness-95 active:scale-[0.98] transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 text-sm disabled:opacity-70"
                   >
-                    <span>Send Verification Code</span>
+                    <span>{isSubmitting ? 'Sending Instructions...' : 'Reset Password'}</span>
                     <span className="material-symbols-outlined text-lg">arrow_forward</span>
                   </button>
                 </div>
               </Form>
+              )}
             </Formik>
           </div>
         </div>

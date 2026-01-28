@@ -6,27 +6,26 @@ import ProtectedRoute from './ProtectedRoute';
 import LoginPage from '../features/auth/LoginPage';
 import RegisterPage from '../features/auth/RegisterPage';
 import ForgotPasswordPage from '../features/auth/ForgotPasswordPage';
-import VerificationPage from '../features/auth/VerificationPage';
-import ResetPasswordPage from '../features/auth/ResetPasswordPage';
 import StoreSelectionPage from '../features/onboarding/StoreSelectionPage';
 import ChatDashboard from '../features/chat/ChatDashboard';
 
 
+import { useAuth } from '../context/AuthContext';
+import authService from '../services/authService';
+
 const AppRoutes = ({
-  isAuthenticated,
-  setIsAuthenticated,
   hasSelectedStores,
   selectedStoreIds,
   setSelectedStoreIds,
 }) => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/login" element={<LoginPage onLogin={() => setIsAuthenticated(true)} />} />
-      <Route path="/register" element={<RegisterPage onRegister={() => setIsAuthenticated(true)} />} />
+      <Route path="/login" element={<LoginPage onLogin={() => {}} />} />
+      <Route path="/register" element={<RegisterPage onRegister={() => {}} />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/verify-code" element={<VerificationPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
       
       {/* Protected Routes - Authenticated only */}
       <Route element={<ProtectedRoute isAllowed={isAuthenticated} redirectTo="/login" />}>
@@ -37,7 +36,7 @@ const AppRoutes = ({
               onComplete={() => {}} 
               selectedIds={selectedStoreIds}
               setSelectedIds={setSelectedStoreIds}
-              onLogout={() => setIsAuthenticated(false)}
+              onLogout={() => authService.logout()}
             />
           } 
         />
@@ -49,7 +48,7 @@ const AppRoutes = ({
             element={
               <ChatDashboard 
                 selectedStoreIds={selectedStoreIds} 
-                onLogout={() => setIsAuthenticated(false)}
+                onLogout={() => authService.logout()}
               />
             } 
           />
