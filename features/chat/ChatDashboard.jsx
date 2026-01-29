@@ -1,11 +1,13 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { INITIAL_STORES, APP_NAME } from '../../constants';
 import { generateComparison } from '../../services/geminiService';
 
 const ChatDashboard = ({ selectedStoreIds, onLogout }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [messages, setMessages] = useState([
     { id: '1', sender: 'ai', text: 'Hello! How can I help you today?' }
   ]);
@@ -78,7 +80,22 @@ const ChatDashboard = ({ selectedStoreIds, onLogout }) => {
           </div>
         </div>
         
-        <div className="pt-6 border-t border-gray-50 dark:border-white/5 shrink-0">
+        <div className="pt-6 border-t border-gray-50 dark:border-white/5 shrink-0 flex flex-col gap-4">
+          {user && (
+            <div className="flex items-center gap-3 px-2 py-2 mb-2">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/20">
+                {user.displayName ? user.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
+              </div>
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-sm font-bold text-smart-dark dark:text-white truncate">
+                  {user.displayName || 'Anonymous User'}
+                </span>
+                <span className="text-[10px] text-slate-gray/60 dark:text-gray-400 truncate">
+                  {user.email}
+                </span>
+              </div>
+            </div>
+          )}
           <button 
             onClick={() => navigate('/onboarding')}
             className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-[0.98]"
