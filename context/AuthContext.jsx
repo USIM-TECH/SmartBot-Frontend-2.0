@@ -44,6 +44,10 @@ export const AuthProvider = ({ children }) => {
                 id: currentUser.id,
                 email: currentUser.email,
                 role: "user", // Default role for frontend users
+                username:
+                  currentUser.user_metadata?.full_name ||
+                  currentUser.user_metadata?.name ||
+                  "",
               };
 
               // Use upsert to handle potential race conditions

@@ -177,7 +177,7 @@ const LoginPage = ({ onLogin }) => {
                 <div className="w-full border-t border-gray-100 dark:border-white/10"></div>
               </div>
               <div className="relative flex justify-center text-[9px] uppercase">
-                <span className="bg-white dark:bg-zinc-900 px-4 text-gray-400 font-bold tracking-widest">
+                <span className=" dark:bg-zinc-900 px-4 text-gray-400 font-bold tracking-widest">
                   Or continue with
                 </span>
               </div>
