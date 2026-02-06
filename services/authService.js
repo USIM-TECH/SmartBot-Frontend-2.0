@@ -26,6 +26,7 @@ const authService = {
           id: data.user.id,
           email: email,
           role: "user",
+          username: fullName,
         });
 
         if (dbError) {
